@@ -1,0 +1,77 @@
+#!/usr/bin/env groovy
+
+def PROJECT = "semics_appV8"
+def TEAM = "semics"
+def label = "${PROJECT}-${UUID.randomUUID().toString()}"
+def MAVEN_OPTIONS = "-DskipTests"
+def IMAGE_URL="https://acrsharedcommon93820.azurecr.io"
+
+podTemplate(
+    label: label,
+    containers: [
+        containerTemplate(name: 'maven', image: 'maven:3.3.9-jdk-8-alpine', ttyEnabled: true, command: 'cat'),
+        containerTemplate(name: 'docker', image: 'docker:18.02', ttyEnabled: true, command: 'cat')
+    ],
+    volumes: [
+        hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+        hostPathVolume(hostPath: '/root/.m2', mountPath: '/root/.m2')
+    ]
+) {
+    node(label) {
+        def commitId
+        stage ('Checkout') {
+            checkout scm
+            commitId = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+        }
+
+        stage ('Build') {
+            container ('maven') {
+                sh """
+                mvn clean install $MAVEN_OPTIONS
+                """
+            }
+        }
+        
+        stage ('Test') {
+            container ('maven') {
+                sh """
+                mvn test
+                """
+            }
+        }
+
+        stage ('Docker build and push') {
+            container ('docker') {
+
+                          docker.withRegistry("${IMAGE_URL}", 'registry-credentials-id') {
+
+                           def customImage = docker.build("${TEAM}/${PROJECT.toLowerCase()}:${commitId}")
+
+                            /* Push the container to the custom Registry */
+                             customImage.push()
+                         }
+
+                }
+
+
+            }
+        
+        
+        stage ('Staging') {
+            sh 'echo "Deploying to staging environment"'
+        }
+        
+        
+         stage ('Production') {
+            sh 'echo "Deploying to production environment"'
+        }
+        
+
+        
+        }
+
+    
+        
+    }
+
+

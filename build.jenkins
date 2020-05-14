@@ -68,6 +68,7 @@ podTemplate(
 
         }
         
+        }
         
          stage ('Production') {
             sh 'echo "Deploying to production environment"'

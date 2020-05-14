@@ -58,7 +58,13 @@ podTemplate(
         
         
         stage ('Staging') {
-            sh 'echo "Deploying to staging environment"'
+            container ('docker') {
+
+                         withKubeConfig([credentialsId: 'app_k8s_secret', serverUrl: 'https://sample-java-app-dev-0319d7d2.hcp.westus2.azmk8s.io]) {
+      sh 'kubectl apply -f deployment.yaml'
+    }
+                        }
+
         }
         
         

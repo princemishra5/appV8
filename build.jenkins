@@ -10,7 +10,8 @@ podTemplate(
     label: label,
     containers: [
         containerTemplate(name: 'maven', image: 'maven:3.3.9-jdk-8-alpine', ttyEnabled: true, command: 'cat'),
-        containerTemplate(name: 'docker', image: 'docker:18.02', ttyEnabled: true, command: 'cat')
+        containerTemplate(name: 'docker', image: 'docker:18.02', ttyEnabled: true, command: 'cat'),
+        containerTemplate(name: 'kubectl', image: 'bitnami/kubectl', ttyEnabled: true, command: 'cat')
     ],
     volumes: [
         hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
@@ -59,7 +60,9 @@ podTemplate(
         
         stage ('Staging') {
             
-                         withKubeConfig([credentialsId: 'app_k8s_secret', serverUrl: 'https://sample-java-app-dev-0319d7d2.hcp.westus2.azmk8s.io']) {
+            container('kubectl'){
+                
+                  withKubeConfig([credentialsId: 'app_k8s_secret', serverUrl: 'https://sample-java-app-dev-0319d7d2.hcp.westus2.azmk8s.io']) {
       sh 'kubectl apply -f deployment.yaml'
     }
 

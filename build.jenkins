@@ -63,10 +63,10 @@ podTemplate(
 try {
         container('kubectl'){
                 
-             //     withKubeConfig([credentialsId: 'app_k8s_secret', serverUrl: 'https://sample-java-app-dev-0319d7d2.hcp.westus2.azmk8s.io']) {
-     // sh 'kubectl apply -f deployment.yaml'
-  //  }
-                  sh 'kubectl get pods'
+                  withKubeConfig([credentialsId: 'app_k8s_secret', serverUrl: 'https://sample-java-app-dev-92dab717.hcp.westus2.azmk8s.io']) {
+      sh 'kubectl get pods -n jenkins'
+    }
+                //  sh 'kubectl get pods'
 
         }
         

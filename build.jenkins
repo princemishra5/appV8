@@ -27,30 +27,30 @@ podTemplate(
 
         stage ('Build') {
             container ('maven') {
-                sh """
-                mvn clean install $MAVEN_OPTIONS
-                """
+              //  sh """
+               // mvn clean install $MAVEN_OPTIONS
+             //   """
             }
         }
         
         stage ('Test') {
             container ('maven') {
-                sh """
-                mvn test
-                """
+             //   sh """
+             //   mvn test
+            //    """
             }
         }
 
         stage ('Docker build and push') {
             container ('docker') {
 
-                          docker.withRegistry("${IMAGE_URL}", 'registry-credentials-id') {
+                         /* docker.withRegistry("${IMAGE_URL}", 'registry-credentials-id') {
 
                            def customImage = docker.build("${TEAM}/${PROJECT.toLowerCase()}:${commitId}")
 
-                            /* Push the container to the custom Registry */
+                            
                              customImage.push()
-                         }
+                         }*/
 
                 }
 
@@ -62,9 +62,10 @@ podTemplate(
             
             container('kubectl'){
                 
-                  withKubeConfig([credentialsId: 'app_k8s_secret', serverUrl: 'https://sample-java-app-dev-0319d7d2.hcp.westus2.azmk8s.io']) {
-      sh 'kubectl apply -f deployment.yaml'
-    }
+             //     withKubeConfig([credentialsId: 'app_k8s_secret', serverUrl: 'https://sample-java-app-dev-0319d7d2.hcp.westus2.azmk8s.io']) {
+     // sh 'kubectl apply -f deployment.yaml'
+  //  }
+                  sh 'kubectl get pods'
 
         }
         

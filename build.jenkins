@@ -60,7 +60,8 @@ podTemplate(
         
         stage ('Staging') {
             
-            container('kubectl'){
+try {
+        container('kubectl'){
                 
              //     withKubeConfig([credentialsId: 'app_k8s_secret', serverUrl: 'https://sample-java-app-dev-0319d7d2.hcp.westus2.azmk8s.io']) {
      // sh 'kubectl apply -f deployment.yaml'
@@ -69,6 +70,12 @@ podTemplate(
 
         }
         
+      }
+      catch (exc) {
+        println "Failed to test - ${currentBuild.fullDisplayName}"
+        throw(exc)
+      }            
+            
         }
         
          stage ('Production') {
